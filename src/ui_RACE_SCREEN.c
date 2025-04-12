@@ -197,7 +197,7 @@ void ui_RACE_SCREEN_screen_init(void)
     lv_obj_set_align(ui_LOGO_BAJA, LV_ALIGN_CENTER);
     lv_obj_add_flag(ui_LOGO_BAJA, LV_OBJ_FLAG_CLICKABLE);     /// Flags
     lv_obj_clear_flag(ui_LOGO_BAJA, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
-    lv_img_set_zoom(ui_LOGO_BAJA, 15);
+    lv_img_set_zoom(ui_LOGO_BAJA, 75);
 
     ui_TBD_2 = lv_obj_create(ui_RACE_SCREEN);
     lv_obj_remove_style_all(ui_TBD_2);
