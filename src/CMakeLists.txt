@@ -1,0 +1,17 @@
+SET(SOURCES ui_comp_background.c
+    ui_comp.c
+    ui_RACE_SCREEN.c
+    ui.c
+    ui_comp_hook.c
+    ui_helpers.c
+    ui_img_170713928.c
+    fonts/ui_font_Roboto-Black_100.c
+    fonts/ui_font_Roboto-Black_24.c
+    fonts/ui_font_Roboto-Black_30.c
+    fonts/ui_font_Roboto-Black_36.c
+    fonts/ui_font_Roboto-Black_42.c
+    fonts/ui_font_Roboto-Black_48.c
+    fonts/ui_font_Roboto-Black_60.c
+    fonts/ui_font_Roboto-Black_80.c)
+
+add_library(ui ${SOURCES})

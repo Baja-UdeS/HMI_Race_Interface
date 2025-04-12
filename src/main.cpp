@@ -53,7 +53,7 @@ void setup()
 {
   Serial.begin(115200); 
 
-  pinMode(19, OUTPUT);//uart1
+  //pinMode(19, OUTPUT);//uart1
 
   Wire.begin(15, 16);
   delay(50);
