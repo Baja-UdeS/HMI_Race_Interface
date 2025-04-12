@@ -91,7 +91,7 @@ void ui_RACE_SCREEN_screen_init(void)
     lv_obj_set_x(ui_FUEL_LAPS_LABEL, 58);
     lv_obj_set_y(ui_FUEL_LAPS_LABEL, 26);
     lv_obj_set_align(ui_FUEL_LAPS_LABEL, LV_ALIGN_TOP_MID);
-    lv_label_set_text(ui_FUEL_LAPS_LABEL, "LAPS");
+    lv_label_set_text(ui_FUEL_LAPS_LABEL, "LAPS LEFT");
     lv_obj_set_style_text_font(ui_FUEL_LAPS_LABEL, &ui_font_Roboto_Black_24, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_FUEL_PERCENTAGE = lv_label_create(ui_FUEL);
