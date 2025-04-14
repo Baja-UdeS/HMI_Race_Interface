@@ -15,6 +15,34 @@
 #include <TCA9534.h>
 TCA9534 ioex;
 
+/* Communication*/
+//Addresses
+#define SLAVE_ADDR 10
+
+// Commands
+#define SET_RPM1 0x01
+#define SET_RPM2 0x02
+#define SET_BUTTON_VAL 0x03
+#define INSTR_ACK 0x04
+
+/*Speed Calculation*/
+
+#define RATIO  (11/125)
+//rpm_wheel = rpm_cvt * ratio;
+#define WHEEL_RADIUS_IN 11
+#define WHEEL_RADIUS_M (WHEEL_RADIUS_IN * 0.0254)
+#define PI 3.1415926535897932384626433832795
+#define WHEEL_CIRCUMFERENCE_M (2 * PI * WHEEL_RADIUS_M)
+//vitesse_ms = (rpm_wheel / 60) * circ;
+//vitesse_kmh = vitesse_ms * 3.6;
+
+uint8_t last_instruction = 0;
+
+float RPM1 = 0.0;
+float RPM2 = 0.0;
+float speed = 0.0;
+int buttons_state = 0;
+
 LGFX gfx;
 
 /* Change to your screen resolution */
@@ -22,7 +50,7 @@ static lv_disp_draw_buf_t draw_buf;
 static lv_color_t *buf;
 static lv_color_t *buf1;
 
-uint16_t touch_x, touch_y;
+//uint16_t touch_x, touch_y;
 
 //  Display refresh
 void my_disp_flush(lv_disp_drv_t *disp, const lv_area_t *area, lv_color_t *color_p) {
@@ -35,7 +63,7 @@ void my_disp_flush(lv_disp_drv_t *disp, const lv_area_t *area, lv_color_t *color
 }
 
 //  Read touch
-void my_touchpad_read( lv_indev_drv_t * indev_driver, lv_indev_data_t * data )
+/*void my_touchpad_read( lv_indev_drv_t * indev_driver, lv_indev_data_t * data )
 {
   data->state = LV_INDEV_STATE_REL;// The state of data existence when releasing the finger
   bool touched = gfx.getTouch( &touch_x, &touch_y );
@@ -47,7 +75,7 @@ void my_touchpad_read( lv_indev_drv_t * indev_driver, lv_indev_data_t * data )
     data->point.x = touch_x;
     data->point.y = touch_y;
   }
-}
+}*/
 
 void setup()
 {
@@ -96,22 +124,38 @@ void setup()
   lv_disp_drv_register(&disp_drv);
 
   // Initialize input device driver program
-  static lv_indev_drv_t indev_drv;
+  /*static lv_indev_drv_t indev_drv;
   lv_indev_drv_init(&indev_drv);
   indev_drv.type = LV_INDEV_TYPE_POINTER;
   indev_drv.read_cb = my_touchpad_read;
   lv_indev_drv_register(&indev_drv);
-
+  */
   delay(100);
   gfx.fillScreen(TFT_BLACK);
 
   ui_init();
 
-  Serial.println( "Setup done" );
+  //Serial.println( "Setup done" );
 }
 
 void loop()
 {
   lv_timer_handler(); /* let the GUI do its work */
+    
+  while (Wire.available()) {
+    last_instruction = Wire.read();
+    Wire.write(INSTR_ACK); // ACK
+    if (last_instruction == SET_RPM1) {
+      RPM1 = Wire.read() / 100.0;
+      lv_label_set_text(ui_RPM, String(RPM1).c_str());
+    } else if (last_instruction == SET_RPM2) {
+      RPM2 = Wire.read() / 100.0;
+      speed = (RPM2 * RATIO) * WHEEL_CIRCUMFERENCE_M / 60.0; // m/s
+      lv_label_set_text(ui_SPEED, String(speed).c_str());
+    } else if (last_instruction == SET_BUTTON_VAL) {
+      buttons_state = Wire.read();
+    }
+  }
+  
   delay(1);
 }
