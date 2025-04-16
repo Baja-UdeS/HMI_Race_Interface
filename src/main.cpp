@@ -15,16 +15,6 @@
 #include <TCA9534.h>
 TCA9534 ioex;
 
-/* Communication*/
-//Addresses
-#define SLAVE_ADDR 10
-
-// Commands
-#define SET_RPM1 0x01
-#define SET_RPM2 0x02
-#define SET_BUTTON_VAL 0x03
-#define INSTR_ACK 0x04
-
 /*Speed Calculation*/
 
 #define RATIO  (11/125)
@@ -99,6 +89,7 @@ void setup()
   delay(100);
   pinMode(1, INPUT);
   /*end*/
+  pinMode(2, INPUT);
 
   // Init Display
   gfx.init();
@@ -141,21 +132,7 @@ void setup()
 void loop()
 {
   lv_timer_handler(); /* let the GUI do its work */
-    
-  while (Wire.available()) {
-    last_instruction = Wire.read();
-    Wire.write(INSTR_ACK); // ACK
-    if (last_instruction == SET_RPM1) {
-      RPM1 = Wire.read() / 100.0;
-      lv_label_set_text(ui_RPM, String(RPM1).c_str());
-    } else if (last_instruction == SET_RPM2) {
-      RPM2 = Wire.read() / 100.0;
-      speed = (RPM2 * RATIO) * WHEEL_CIRCUMFERENCE_M / 60.0; // m/s
-      lv_label_set_text(ui_SPEED, String(speed).c_str());
-    } else if (last_instruction == SET_BUTTON_VAL) {
-      buttons_state = Wire.read();
-    }
-  }
   
+  //Serial.println(digitalRead(2));
   delay(1);
 }
