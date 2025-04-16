@@ -9,11 +9,15 @@
 #include <Adafruit_SSD1306.h>
 #include <Adafruit_GFX.h>
 
+#include <thread.hpp>
+
 #include "ui.h"
 
 /* Expand IO */
 #include <TCA9534.h>
 TCA9534 ioex;
+
+freertos::thread interface;
 
 /*Speed Calculation*/
 
@@ -126,13 +130,20 @@ void setup()
 
   ui_init();
 
+  interface = freertos::thread::create_affinity(1-freertos::thread::current().affinity(),[](void*){
+    while(true) {
+      lv_timer_handler(); /* let the GUI do its work */
+      delay(1);
+    }
+  },nullptr,1,2000);
+
+  interface.start();
+
   //Serial.println( "Setup done" );
 }
 
 void loop()
 {
-  lv_timer_handler(); /* let the GUI do its work */
-  
-  //Serial.println(digitalRead(2));
-  delay(1);
+  Serial.println(digitalRead(2));
+  delay(250);
 }
