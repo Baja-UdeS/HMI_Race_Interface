@@ -9,9 +9,20 @@
 #include <Adafruit_SSD1306.h>
 #include <Adafruit_GFX.h>
 
-//#include <thread.hpp>
+#include <thread.hpp>
 
 #include "ui.h"
+
+/* Multi Threading */
+using namespace freertos;
+
+thread speed_update;
+lv_timer_t * label_updates_timer;
+
+/* Ticker */
+#include <Ticker.h>
+
+Ticker label_updates;
 
 /* Expand IO */
 #include <TCA9534.h>
@@ -36,6 +47,8 @@ float RPM2 = 0.0;
 float speed = 0.0;
 int buttons_state = 0;
 
+char * speed_str = (char *)malloc(3 * sizeof(char));
+
 LGFX gfx;
 
 /* Change to your screen resolution */
@@ -53,6 +66,10 @@ void my_disp_flush(lv_disp_drv_t *disp, const lv_area_t *area, lv_color_t *color
   gfx.pushImageDMA(area->x1, area->y1, area->x2 - area->x1 + 1, area->y2 - area->y1 + 1, (lgfx::rgb565_t *)&color_p->full);
 
   lv_disp_flush_ready(disp);  //	Tell lvgl that the refresh is complete
+}
+
+void label_callback(lv_timer_t * timer) {
+  lv_label_set_text(ui_SPEED, speed_str);
 }
 
 //  Read touch
@@ -129,7 +146,23 @@ void setup()
 
   ui_init();
 
+  //label_updates.attach_ms(100, label_callback);
+  label_updates_timer = lv_timer_create(label_callback, 1000, NULL);
 
+  speed_update = thread::create_affinity(1-thread::current().affinity(),[](void*){
+    while(true) {
+      
+      speed = speed + 1;
+      if (speed > 100) {
+        speed = 0;
+      }
+      strcpy(speed_str, String((int)speed).c_str());
+      delay(250);
+
+    }
+  },nullptr,1,2000);
+  
+  speed_update.start();
   //Serial.println( "Setup done" );
 }
 
