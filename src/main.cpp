@@ -19,11 +19,6 @@ using namespace freertos;
 thread speed_update;
 lv_timer_t * label_updates_timer;
 
-/* Ticker */
-#include <Ticker.h>
-
-Ticker label_updates;
-
 /* Expand IO */
 #include <TCA9534.h>
 TCA9534 ioex;
@@ -146,8 +141,7 @@ void setup()
 
   ui_init();
 
-  //label_updates.attach_ms(100, label_callback);
-  label_updates_timer = lv_timer_create(label_callback, 1000, NULL);
+  label_updates_timer = lv_timer_create(label_callback, 500, NULL);
 
   speed_update = thread::create_affinity(1-thread::current().affinity(),[](void*){
     while(true) {
